@@ -26,7 +26,6 @@ chrome.webNavigation.onCommitted.addListener(details=>{
 
 function vkplayTools(){
   setTimeout(()=>{
-    console.log('script loaded');
     let points = document.querySelector('[class^="PointActions_root"]');
 
     if(points != null){
