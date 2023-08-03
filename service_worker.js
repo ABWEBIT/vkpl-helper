@@ -1,31 +1,29 @@
 const filter = {url: [{hostContains: 'vkplay.live'}]};
-const stream = new RegExp(/^(https:\/\/)vkplay.live\/([-a-zA-Z0-9%_&]+)$/);
-const transition = ['reload','link','typed','generated'];
+const stream = new RegExp(/^(https:\/\/)vkplay.live\/([-a-zA-Z0-9%_&.]+)$/);
+const transition = ['reload','generated','start_page'];
 
 function vkplayFunc(data){
   if(stream.test(data.url) === true){
-    chrome.tabs.query({currentWindow:true,active:true},([thisTab])=>{
-      chrome.scripting.executeScript({
-        target: {tabId: thisTab.id},
-        func: vkplayTools
-      });
+    chrome.scripting.executeScript({
+      target: {tabId: data.tabId},
+      func: vkplayTools
     });
   };
 };
 
-chrome.webNavigation.onHistoryStateUpdated.addListener(vkplayFunc,filter);
+chrome.webNavigation.onHistoryStateUpdated.addListener(details=>{
+  vkplayFunc(details);
+},filter);
 
 chrome.webNavigation.onCommitted.addListener(details=>{
-  if(transition.includes(details.transitionType)){
-    chrome.webNavigation.onCompleted.addListener(function onComplete(){
-      vkplayFunc(details);
-      chrome.webNavigation.onCompleted.removeListener(onComplete);
-    });
-  };
-});
+  if(transition.includes(details.transitionType)) vkplayFunc(details);
+},filter);
+
 
 function vkplayTools(){
+
   setTimeout(()=>{
+    // баллы
     console.log('script loaded');
     let points = document.querySelector('[class^="PointActions_root"]');
 
@@ -48,10 +46,12 @@ function vkplayTools(){
       observer.observe(points, {childList: true});
     };
 
+    // сердечко
     let heartsButton = document.querySelector('[class^="LikeButton_container"]');
-    let heartsStatus = document.querySelector('[class*="LikeButton_iconLiked"]');
-
-    if(heartsStatus === null) heartsButton.click();
+    if(heartsButton != null){
+      let heartsStatus = document.querySelector('[class*="LikeButton_iconLiked"]');
+      if(heartsStatus === null) heartsButton.click();
+    };
 
 
   },1000);
