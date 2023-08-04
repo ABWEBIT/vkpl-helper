@@ -2,6 +2,18 @@ const filter = {url: [{hostContains: 'vkplay.live'}]};
 const stream = new RegExp(/^(https:\/\/)vkplay.live\/([-a-zA-Z0-9%_&.]+)$/);
 const transition = ['reload','generated','start_page'];
 
+chrome.storage.sync.get(['loot']).then((result)=>{
+  if(result.loot == null || chrome.runtime.lastError){
+    chrome.storage.sync.set({loot:'on'});
+  }
+});
+
+chrome.storage.sync.get(['like']).then((result)=>{
+  if(result.like == null || chrome.runtime.lastError){
+    chrome.storage.sync.set({like:'on'});
+  }
+});
+
 function vkplayFunc(data){
   if(stream.test(data.url) === true){
     chrome.scripting.executeScript({
@@ -62,15 +74,3 @@ function vkplayTools(){
 
   },1000);
 };
-
-chrome.storage.sync.get(['loot']).then((result)=>{
-  if(result.loot == null || chrome.runtime.lastError){
-    chrome.storage.sync.set({loot:'on'});
-  }
-});
-
-chrome.storage.sync.get(['like']).then((result)=>{
-  if(result.like == null || chrome.runtime.lastError){
-    chrome.storage.sync.set({like:'on'});
-  }
-});
