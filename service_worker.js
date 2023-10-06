@@ -38,20 +38,16 @@ function vkplayTools(){
     chrome.storage.sync.get(['loot']).then((result)=>{
       if(result.loot != 'off' && !chrome.runtime.lastError){
 
-        let points = document.querySelector('[class^="PointActions_root"]');
+        let points = document.querySelector('[class^="PointActions_buttonBonus"]');
 
         if(points != null){
-          function pointsAction(){
-            let pointsButton = document.querySelector('[class^="PointActions_buttonBonus"]');
-            if(pointsButton != null) pointsButton.click();
-          };
-          pointsAction();
+          points.click();
 
           let observer = new MutationObserver(pointsObserver);
 
           function pointsObserver(mutations){
             for(let mutation of mutations){
-              if(mutation.type === 'childList') pointsAction();
+              if(mutation.type === 'childList') points.click();
             }
           };
 
