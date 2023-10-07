@@ -32,41 +32,52 @@ chrome.webNavigation.onCommitted.addListener(details=>{
 },filter);
 
 function vkplayTools(){
-  setTimeout(()=>{
-    
-    // баллы
+
+  // баллы
+  let intervalPoints = setInterval(()=>{
     chrome.storage.sync.get(['loot']).then((result)=>{
       if(result.loot != 'off' && !chrome.runtime.lastError){
-
-        let points = document.querySelector('[class^="PointActions_buttonBonus"]');
-
+        let points = document.querySelector('[class^="PointActions_root"]');
         if(points != null){
-          points.click();
-
+          let pointsButton = document.querySelector('[class^="PointActions_buttonBonus"]');
+          if(pointsButton != null){
+            if(intervalPoints) clearInterval(intervalPoints);
+            pointsButton.click();
+          };
           let observer = new MutationObserver(pointsObserver);
-
           function pointsObserver(mutations){
             for(let mutation of mutations){
-              if(mutation.type === 'childList') points.click();
+              if(mutation.type === 'childList'){
+                let pointsButton = document.querySelector('[class^="PointActions_buttonBonus"]');
+                if(pointsButton != null){
+                  if(intervalPoints) clearInterval(intervalPoints);
+                  pointsButton.click();
+                };
+              }
             }
           };
-
           observer.observe(points, {childList: true});
         };
-
       };
     });
+  },1000);
+  intervalPoints;
 
-    // сердечко
+  // сердечко
+  let intervalHeart = setInterval(()=>{
     chrome.storage.sync.get(['like']).then((result)=>{
       if(result.like != 'off' && !chrome.runtime.lastError){
-        let heartsButton = document.querySelector('[class^="LikeButton_container"]');
-        if(heartsButton != null){
-          let heartsStatus = document.querySelector('[class*="LikeButton_iconLiked"]');
-          if(heartsStatus === null) heartsButton.click();
+        let heartButton = document.querySelector('[class^="LikeButton_container"]');
+        if(heartButton != null){
+          clearInterval(intervalHeart);
+          let heartStatus = document.querySelector('[class*="LikeButton_iconLiked"]');
+          if(heartStatus === null){
+            heartButton.click();
+          };
         };
       };
     });
-
   },1000);
+  intervalHeart;
+
 };
