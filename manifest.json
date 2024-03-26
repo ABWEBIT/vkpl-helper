@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
   "name": "VKPL помощник",
-  "description": "Полезные сервисы для vkplay.live",
+  "description": "Полезные сервисы для live.vkplay.ru",
   "version": "1.5.2",
   "permissions": ["webNavigation","activeTab","tabs","scripting","storage"],
   "action": {
     "default_popup": "settings.html"
   },
   "background": {"service_worker": "service_worker.js"},
-  "host_permissions": ["*://vkplay.live/*"]
+  "host_permissions": ["*://live.vkplay.ru/*"]
 }
