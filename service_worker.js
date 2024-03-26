@@ -1,5 +1,5 @@
-const filter = {url: [{hostContains: 'vkplay.live'}]};
-const stream = new RegExp(/^(https:\/\/)vkplay.live\/([-a-zA-Z0-9%_&.]+)$/);
+const filter = {url: [{hostContains: 'live.vkplay.ru'}]};
+const stream = new RegExp(/^(https:\/\/)live.vkplay.ru\/([-a-zA-Z0-9%_&.]+)$/);
 const transition = ['reload','generated','start_page'];
 
 chrome.storage.sync.get(['loot']).then((result)=>{
@@ -18,7 +18,7 @@ function vkplayFunc(data){
   if(stream.test(data.url) === true){
     chrome.scripting.executeScript({
       target: {tabId: data.tabId},
-      func: vkplayTools
+      func: vkplayHelper
     });
   };
 };
@@ -31,7 +31,7 @@ chrome.webNavigation.onCommitted.addListener(details=>{
   if(transition.includes(details.transitionType)) vkplayFunc(details);
 },filter);
 
-function vkplayTools(){
+function vkplayHelper(){
 
   // баллы
   let intervalPoints = setInterval(()=>{
@@ -69,7 +69,7 @@ function vkplayTools(){
       if(result.like != 'off' && !chrome.runtime.lastError){
         let heartButton = document.querySelector('[class^="LikeButton_container"]');
         if(heartButton != null){
-          clearInterval(intervalHeart);
+          if(intervalHeart) clearInterval(intervalHeart);
           let heartStatus = document.querySelector('[class*="LikeButton_iconLiked"]');
           if(heartStatus === null){
             heartButton.click();
