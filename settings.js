@@ -1,41 +1,55 @@
 'use strict';
 let
-loot = document.getElementById('loot'),
-like = document.getElementById('like'),
+pointsEl = document.getElementById('points'),
+heartsEl = document.getElementById('hearts'),
+recommEl = document.getElementById('recomm'),
 buttons = document.querySelectorAll('.button');
 
-chrome.storage.sync.get(['loot']).then((result)=>{
-  loot.setAttribute('data-state',result.loot);
-  console.log(result.loot);
-});
-chrome.storage.sync.get(['like']).then((result)=>{
-  like.setAttribute('data-state',result.like);
-  console.log(result.loot);
-});
+chrome.storage.sync.get(['pointsKey']).then((r)=>pointsEl.setAttribute('data-state',r.pointsKey));
+chrome.storage.sync.get(['heartsKey']).then((r)=>heartsEl.setAttribute('data-state',r.heartsKey));
+chrome.storage.sync.get(['recommKey']).then((r)=>recommEl.setAttribute('data-state',r.recommKey));
 
 buttons.forEach(function(button){
   button.addEventListener('click',()=>{
-    chrome.storage.sync.get([button.getAttribute('id')]).then((result)=>{
-      if(result && button.getAttribute('id') === 'loot'){
-        if(result.loot === 'on'){
-          chrome.storage.sync.set({loot:'off'});
-          loot.setAttribute('data-state','off');
+
+    switch (button.getAttribute('id')){
+      case 'points':
+      chrome.storage.sync.get(['pointsKey']).then((r)=>{
+        if(r.pointsKey === 'on'){
+          chrome.storage.sync.set({pointsKey:'off'});
+          pointsEl.setAttribute('data-state','off');
         }
-        else if(result.loot === 'off'){
-          chrome.storage.sync.set({loot:'on'});
-          loot.setAttribute('data-state','on');
+        else if(r.pointsKey === 'off'){
+          chrome.storage.sync.set({pointsKey:'on'});
+          pointsEl.setAttribute('data-state','on');
         }
-      }
-      else if(result && button.getAttribute('id') === 'like'){
-        if(result.like === 'on'){
-          chrome.storage.sync.set({like:'off'});
-          like.setAttribute('data-state','off');
+      });
+      break;
+      case 'hearts':
+      chrome.storage.sync.get(['heartsKey']).then((r)=>{
+        if(r.heartsKey === 'on'){
+          chrome.storage.sync.set({heartsKey:'off'});
+          heartsEl.setAttribute('data-state','off');
         }
-        else if(result.like === 'off'){
-          chrome.storage.sync.set({like:'on'});
-          like.setAttribute('data-state','on');
+        else if(r.heartsKey === 'off'){
+          chrome.storage.sync.set({heartsKey:'on'});
+          heartsEl.setAttribute('data-state','on');
         }
-      };
-    });
+      });
+      break;
+      case 'recomm':
+      chrome.storage.sync.get(['recommKey']).then((r)=>{
+        if(r.recommKey === 'on'){
+          chrome.storage.sync.set({recommKey:'off'});
+          recommEl.setAttribute('data-state','off');
+        }
+        else if(r.recommKey === 'off'){
+          chrome.storage.sync.set({recommKey:'on'});
+          recommEl.setAttribute('data-state','on');
+        };
+      });
+      break;
+    };
+
   })
 });
