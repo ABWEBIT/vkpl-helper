@@ -1,4 +1,4 @@
-const filter = {url: [{hostContains: 'live.vkplay.ru'}]};
+const filter = {url: [{hostContains: '.vkplay.ru'}]};
 const stream = new RegExp(/^(https:\/\/)live.vkplay.ru\/([-a-zA-Z0-9%_&.]+)$/);
 const transition = ['reload','generated','start_page'];
 
