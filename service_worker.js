@@ -1,24 +1,33 @@
 const filter = {url: [{hostContains: '.vkplay.ru'}]};
-const stream = new RegExp(/^(https:\/\/)live.vkplay.ru\/([-a-zA-Z0-9%_&.]+)$/);
+const vkPlayLiveSite = new RegExp(/^(https:\/\/)live.vkplay.ru*/);
+const vkPlayLiveStream = new RegExp(/^(https:\/\/)live.vkplay.ru\/([-a-zA-Z0-9%_&.]+)$/);
 const transition = ['reload','generated','start_page'];
 
-chrome.storage.sync.get(['loot']).then((result)=>{
-  if(result.loot == null || chrome.runtime.lastError){
-    chrome.storage.sync.set({loot:'on'});
-  }
+chrome.storage.sync.get(['pointsKey']).then((r)=>{
+  if(r.pointsKey == null || chrome.runtime.lastError) chrome.storage.sync.set({pointsKey:'on'});
 });
 
-chrome.storage.sync.get(['like']).then((result)=>{
-  if(result.like == null || chrome.runtime.lastError){
-    chrome.storage.sync.set({like:'on'});
-  }
+chrome.storage.sync.get(['heartsKey']).then((r)=>{
+  if(r.heartsKey == null || chrome.runtime.lastError) chrome.storage.sync.set({heartsKey:'on'});
+});
+
+chrome.storage.sync.get(['recommKey']).then((r)=>{
+  if(r.recommKey == null || chrome.runtime.lastError) chrome.storage.sync.set({recommKey:'off'});
 });
 
 function vkplayFunc(data){
-  if(stream.test(data.url) === true){
+
+  if(vkPlayLiveSite.test(data.url) === true){
     chrome.scripting.executeScript({
       target: {tabId: data.tabId},
-      func: vkplayHelper
+      func: vkPlayLiveSiteHelper
+    });
+  };
+
+  if(vkPlayLiveStream.test(data.url) === true){
+    chrome.scripting.executeScript({
+      target: {tabId: data.tabId},
+      func: vkPlayLiveStreamHelper
     });
   };
 };
@@ -31,42 +40,60 @@ chrome.webNavigation.onCommitted.addListener(details=>{
   if(transition.includes(details.transitionType)) vkplayFunc(details);
 },filter);
 
-function vkplayHelper(){
+function vkPlayLiveSiteHelper(){
+  // рекомендации
+  chrome.storage.sync.get(['recommKey']).then((r)=>{
+    let channelsRoot = document.querySelector('[class*="Channels_root"]');
+    if(r.recommKey !== 'off' && !chrome.runtime.lastError){
+      if(channelsRoot !== null){
+        channelsRoot.querySelectorAll('[class^="Channels_title"]')[1].style.display = "none";
+        channelsRoot.querySelectorAll('[class^="ChannelsList_container"]')[1].style.display = "none";
+      };
+    }
+    else if(r.recommKey === 'off' && !chrome.runtime.lastError){
+      if(channelsRoot !== null){
+        channelsRoot.querySelectorAll('[class^="Channels_title"]')[1].style.display = "flex";
+        channelsRoot.querySelectorAll('[class^="ChannelsList_container"]')[1].style.display = "flex";
+      };
+    };
+  });
+}
+
+function vkPlayLiveStreamHelper(){
 
   // баллы
-  let intervalPoints = setInterval(()=>{
-    chrome.storage.sync.get(['loot']).then((result)=>{
-      if(result.loot != 'off' && !chrome.runtime.lastError){
-        let points = document.querySelector('[class^="PointActions_root"]');
-        if(points != null){
-          let pointsButton = document.querySelector('[class^="PointActions_buttonBonus"]');
-          if(pointsButton != null){
-            if(intervalPoints) clearInterval(intervalPoints);
-            pointsButton.click();
+  const pointsFunc=()=>{
+    chrome.storage.sync.get(['points']).then((result)=>{
+      if(result.points != 'off' && !chrome.runtime.lastError){
+        let pointsObject = document.querySelector('[class^="PointActions_root"]');
+        if(pointsObject != null){
+          const pointsCollecting=()=>{
+            let pointsButton = document.querySelector('[class^="PointActions_buttonBonus"]');
+            if(pointsButton != null){
+              if(intervalPoints) clearInterval(intervalPoints);
+              pointsButton.click();
+            };
           };
+          pointsCollecting();
           let observer = new MutationObserver(pointsObserver);
           function pointsObserver(mutations){
             for(let mutation of mutations){
-              if(mutation.type === 'childList'){
-                let pointsButton = document.querySelector('[class^="PointActions_buttonBonus"]');
-                if(pointsButton != null){
-                  if(intervalPoints) clearInterval(intervalPoints);
-                  pointsButton.click();
-                };
-              }
+              if(mutation.type === 'childList') pointsCollecting();
             }
           };
-          observer.observe(points, {childList: true});
+          observer.observe(pointsObject, {childList: true});
         };
       };
     });
-  },1000);
+  };
+
+  let intervalPoints = setInterval(()=>pointsFunc(),1000);
   intervalPoints;
 
   // сердечко
   let intervalHeart = setInterval(()=>{
-    chrome.storage.sync.get(['like']).then((result)=>{
-      if(result.like != 'off' && !chrome.runtime.lastError){
+    chrome.storage.sync.get(['heart']).then((result)=>{
+      if(result.heart != 'off' && !chrome.runtime.lastError){
         let heartButton = document.querySelector('[class^="LikeButton_container"]');
         if(heartButton != null){
           if(intervalHeart) clearInterval(intervalHeart);
