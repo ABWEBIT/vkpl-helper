@@ -62,7 +62,7 @@ function vkPlayLiveSiteHelper(){
 function vkPlayLiveStreamHelper(){
 
   // баллы
-  const pointsFunc=()=>{
+  let intervalPoints = setInterval(()=>{
     chrome.storage.sync.get(['points']).then((result)=>{
       if(result.points != 'off' && !chrome.runtime.lastError){
         let pointsObject = document.querySelector('[class^="PointActions_root"]');
@@ -85,9 +85,7 @@ function vkPlayLiveStreamHelper(){
         };
       };
     });
-  };
-
-  let intervalPoints = setInterval(()=>pointsFunc(),1000);
+  },1000);
   intervalPoints;
 
   // сердечко
