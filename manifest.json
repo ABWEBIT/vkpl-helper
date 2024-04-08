@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "VKPL помощник",
   "description": "Полезные сервисы для live.vkplay.ru",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "permissions": ["webNavigation","activeTab","tabs","scripting","storage"],
   "action": {
     "default_popup": "settings.html"
