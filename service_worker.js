@@ -43,10 +43,8 @@ chrome.webNavigation.onCommitted.addListener(details=>{
 function vkPlayLiveSiteHelper(){
   // рекомендации
   let channelsRoot = document.querySelector('[class*="Channels_root"]');
-  if(channelsRoot === null) return;
-  else if(channelsRoot !== null){
-
-    const channelsPanel=()=>{
+  if(channelsRoot){
+    let channelsPanel=()=>{
       chrome.storage.sync.get(['recommKey']).then((r)=>{
         if(r.recommKey === 'on' && !chrome.runtime.lastError){
           let channelsTitle = channelsRoot.querySelectorAll('[class*="Channels_title"]')[1];
@@ -57,8 +55,8 @@ function vkPlayLiveSiteHelper(){
           if(channelsPortal) channelsPortal.style.display = "none";
           let channelsIconRecommended = channelsRoot.querySelector('[class*="Channels_iconRecommended"]');
           if(channelsIconRecommended) channelsIconRecommended.style.height = "0px";
-        }
-    });
+        };
+      });
     };
     channelsPanel();
 
@@ -68,53 +66,58 @@ function vkPlayLiveSiteHelper(){
         if(mutation.type === 'childList') channelsPanel();
       }
     };
-    observerChannels.observe(channelsRoot, {childList: true});
-
+    observerChannels.observe(channelsRoot,{childList: true});
   };
 };
 
 function vkPlayLiveStreamHelper(){
+
   // баллы
-  let intervalPoints = setInterval(()=>{
-    chrome.storage.sync.get(['pointsKey']).then((r)=>{
-      if(r.pointsKey === 'on' && !chrome.runtime.lastError){
-        let pointsObject = document.querySelector('[class^="PointActions_root"]');
-        if(pointsObject){
-          const pointsCollecting=()=>{
-            let pointsButton = document.querySelector('[class^="PointActions_buttonBonus"]');
-            if(pointsButton){
-              if(intervalPoints) clearInterval(intervalPoints);
-              pointsButton.click();
-            };
+  let pointsInterval = setInterval(()=>{
+    let pointsButton = document.querySelector('[class*="PointActions_root"]');
+    if(pointsButton){
+      if(pointsInterval) clearInterval(pointsInterval);
+
+      chrome.storage.sync.get(['pointsKey']).then((r)=>{
+        if(r.pointsKey === 'on' && !chrome.runtime.lastError){
+
+          let pointsCollecting=()=>{
+            let pointsButton = document.querySelector('[class*="PointActions_buttonBonus"]');
+            if(pointsButton) pointsButton.click();
           };
           pointsCollecting();
-          let observer = new MutationObserver(pointsObserver);
-          function pointsObserver(mutations){
+
+          let observerPoints = new MutationObserver(pointsObserverFunc);
+          function pointsObserverFunc(mutations){
             for(let mutation of mutations){
               if(mutation.type === 'childList') pointsCollecting();
             }
           };
-          observer.observe(pointsObject, {childList: true});
+          observerPoints.observe(pointsButton,{childList: true});
+
         };
-      };
-    });
-  },1000);
-  intervalPoints;
+      });
+
+    };
+  },500);
 
   // сердечко
-  let intervalHeart = setInterval(()=>{
-    chrome.storage.sync.get(['heartsKey']).then((r)=>{
-      if(r.heartsKey === 'on' && !chrome.runtime.lastError){
-        let heartButton = document.querySelector('[class*="LikeButton_container"]');
-        if(heartButton){
-          let heartStatus = document.querySelector('[class*="LikeButton_iconLiked"]');
-          if(!heartStatus){
-            if(intervalHeart) clearInterval(intervalHeart);
-            heartButton.click();
-          }
+  let heartsInterval = setInterval(()=>{
+    let heartsButton = document.querySelector('[class*="LikeButton_container"]');
+    if(heartsButton){
+      if(heartsInterval) clearInterval(heartsInterval)
+      chrome.storage.sync.get(['heartsKey']).then((r)=>{
+        if(r.heartsKey === 'on' && !chrome.runtime.lastError){
+          let heartStatus = heartsButton.querySelector('[class*="LikeButton_iconLiked"]');
+          if(heartStatus == null) heartsButton.click();
         };
-      };
-    });
-  },1000);
-  intervalHeart;
+      });
+    };
+  },500);
+
+  setTimeout(()=>{
+    if(pointsInterval) clearInterval(pointsInterval);
+    if(heartsInterval) clearInterval(heartsInterval);
+  },5000);
+
 };
