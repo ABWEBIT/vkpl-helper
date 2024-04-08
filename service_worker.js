@@ -56,7 +56,7 @@ function vkPlayLiveSiteHelper(){
           let channelsPortal = channelsRoot.querySelector('[class*="Channels_portalBtn"]');
           if(channelsPortal) channelsPortal.style.display = "none";
           let channelsIconRecommended = channelsRoot.querySelector('[class*="Channels_iconRecommended"]');
-          if(channelsIconRecommended) channelsIconRecommended.style.display = "none";
+          if(channelsIconRecommended) channelsIconRecommended.style.height = "0px";
         }
     });
     };
