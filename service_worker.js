@@ -42,34 +42,47 @@ chrome.webNavigation.onCommitted.addListener(details=>{
 
 function vkPlayLiveSiteHelper(){
   // рекомендации
-  chrome.storage.sync.get(['recommKey']).then((r)=>{
-    let channelsRoot = document.querySelector('[class*="Channels_root"]');
-    if(r.recommKey !== 'off' && !chrome.runtime.lastError){
-      if(channelsRoot !== null){
-        channelsRoot.querySelectorAll('[class^="Channels_title"]')[1].style.display = "none";
-        channelsRoot.querySelectorAll('[class^="ChannelsList_container"]')[1].style.display = "none";
-      };
-    }
-    else if(r.recommKey === 'off' && !chrome.runtime.lastError){
-      if(channelsRoot !== null){
-        channelsRoot.querySelectorAll('[class^="Channels_title"]')[1].style.display = "flex";
-        channelsRoot.querySelectorAll('[class^="ChannelsList_container"]')[1].style.display = "flex";
-      };
+  let channelsRoot = document.querySelector('[class*="Channels_root"]');
+  if(channelsRoot === null) return;
+  else if(channelsRoot !== null){
+
+    const channelsPanel=()=>{
+      chrome.storage.sync.get(['recommKey']).then((r)=>{
+        if(r.recommKey === 'on' && !chrome.runtime.lastError){
+          let channelsTitle = channelsRoot.querySelectorAll('[class*="Channels_title"]')[1];
+          if(channelsTitle) channelsTitle.style.display = "none";
+          let channelsList = channelsRoot.querySelectorAll('[class*="ChannelsList_container"]')[1];
+          if(channelsList) channelsList.style.display = "none";
+          let channelsPortal = channelsRoot.querySelector('[class*="Channels_portalBtn"]');
+          if(channelsPortal) channelsPortal.style.display = "none";
+          let channelsIconRecommended = channelsRoot.querySelector('[class*="Channels_iconRecommended"]');
+          if(channelsIconRecommended) channelsIconRecommended.style.display = "none";
+        }
+    });
     };
-  });
-}
+    channelsPanel();
+
+    let observerChannels = new MutationObserver(channelsObserverFunc);
+    function channelsObserverFunc(mutations){
+      for(let mutation of mutations){
+        if(mutation.type === 'childList') channelsPanel();
+      }
+    };
+    observerChannels.observe(channelsRoot, {childList: true});
+
+  };
+};
 
 function vkPlayLiveStreamHelper(){
-
   // баллы
   let intervalPoints = setInterval(()=>{
-    chrome.storage.sync.get(['points']).then((result)=>{
-      if(result.points != 'off' && !chrome.runtime.lastError){
+    chrome.storage.sync.get(['pointsKey']).then((r)=>{
+      if(r.pointsKey === 'on' && !chrome.runtime.lastError){
         let pointsObject = document.querySelector('[class^="PointActions_root"]');
-        if(pointsObject != null){
+        if(pointsObject){
           const pointsCollecting=()=>{
             let pointsButton = document.querySelector('[class^="PointActions_buttonBonus"]');
-            if(pointsButton != null){
+            if(pointsButton){
               if(intervalPoints) clearInterval(intervalPoints);
               pointsButton.click();
             };
@@ -90,19 +103,18 @@ function vkPlayLiveStreamHelper(){
 
   // сердечко
   let intervalHeart = setInterval(()=>{
-    chrome.storage.sync.get(['heart']).then((result)=>{
-      if(result.heart != 'off' && !chrome.runtime.lastError){
-        let heartButton = document.querySelector('[class^="LikeButton_container"]');
-        if(heartButton != null){
-          if(intervalHeart) clearInterval(intervalHeart);
+    chrome.storage.sync.get(['heartsKey']).then((r)=>{
+      if(r.heartsKey === 'on' && !chrome.runtime.lastError){
+        let heartButton = document.querySelector('[class*="LikeButton_container"]');
+        if(heartButton){
           let heartStatus = document.querySelector('[class*="LikeButton_iconLiked"]');
-          if(heartStatus === null){
+          if(!heartStatus){
+            if(intervalHeart) clearInterval(intervalHeart);
             heartButton.click();
-          };
+          }
         };
       };
     });
   },1000);
   intervalHeart;
-
 };
