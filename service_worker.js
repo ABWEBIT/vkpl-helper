@@ -66,7 +66,7 @@ function vkPlayLiveSiteHelper(){
         if(mutation.type === 'childList') channelsPanel();
       }
     };
-    observerChannels.observe(channelsRoot,{childList: true});
+    observerChannels.observe(channelsRoot,{subtree:true,childList:true});
   };
 };
 
@@ -93,7 +93,7 @@ function vkPlayLiveStreamHelper(){
               if(mutation.type === 'childList') pointsCollecting();
             }
           };
-          observerPoints.observe(pointsButton,{childList: true});
+          observerPoints.observe(pointsButton,{subtree:true,childList:true});
 
         };
       });
