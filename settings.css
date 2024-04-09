@@ -28,6 +28,12 @@ body{
   cursor:pointer;
   transition:background-color 0.2s,color 0.2s;}
 
+#reload.button{
+  text-align:center;
+  padding:10px 20px;}
+
+#reload.button .text{width:100%;}
+
 @media (hover: hover){
 .button:hover{
   color:rgb(255,255,255);
