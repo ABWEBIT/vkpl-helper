@@ -49,6 +49,9 @@ buttons.forEach(function(button){
         };
       });
       break;
+      case 'reload':
+        chrome.tabs.reload();
+      break;
     };
 
   })
